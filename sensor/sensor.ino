@@ -13,7 +13,8 @@
 
 #define COUNT 1250
 
-// ADC values
+// ADC 
+// Z-axis A0, y-axis A1, x-axis A2 
 uint8_t admuxes[3] = {ADMUX_X, ADMUX_Y, ADMUX_Z};
 float mean[3] = {0, 0, 0}; // ADC mean for x, y, z axis 
 uint16_t adc_value = 0; // ADC value read each time 
