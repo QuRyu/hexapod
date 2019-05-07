@@ -1,6 +1,7 @@
 import sys
 from sympy import * 
 from mpmath import radians
+import numpy as np							# for matrix math
 
 ALPHA = 0
 A = 1 
@@ -71,6 +72,20 @@ def main( argv ):
     jacobian_inverse = simplify(jacobian_inverse)
     
     print("inverse jacobian matrix\n", jacobian_inverse)
+
+    #Compose Matrix of Forces
+    Fx, Fy = symbols("Fx Fy")
+    forces = np.array([ [Fx], [Fy] ])
+    
+    #Calculate the torque values
+    torques = jacobian_inverse@forces
+    print("Torques")
+    print(torques)
+        
+    #Calculate the actual force values at the end effector
+    forces2 = jacobian_m@torques
+    print("Recalculated Forces")
+    print(forces2)
 
     # jacobian_m = jacobian(final_matrx_simplified, theta_1, theta_2, theta_5)
 
