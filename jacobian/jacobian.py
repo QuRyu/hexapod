@@ -15,7 +15,7 @@ def generate_trans_matrix(dh_params):
     d = dh_params[D]
     theta = dh_params[THETA]
 
-    print("alpha {}, a {}, d {}, theta {}".format(alpha, a, d, theta))
+    # print("alpha {}, a {}, d {}, theta {}".format(alpha, a, d, theta))
     return Matrix([ [cos(theta), -sin(theta), 0, a],
                     [sin(theta)*cos(alpha), cos(theta)*cos(alpha), -sin(alpha), -d*sin(alpha)],
                     [sin(theta)*sin(alpha), cos(theta)*sin(alpha), cos(alpha), d*cos(alpha)],
@@ -31,48 +31,46 @@ def simplify_zero(m):
                     m[i, j] = 0 
     return m 
 
-# def jacobian(coordinates, theta1, theta2, theta3): 
-    # x = coordinates[0]
-    # y = coordinates[1] 
+def jacobian(coordinates, theta1, theta2): 
+    x = coordinates[0]
+    y = coordinates[1] 
     # z = coordinates[2]
 
-    # return Matrix([ [diff(x, theta1), diff(x, theta2), diff(x, theta3)],
-                    # [diff(y, theta1), diff(y, theta2), diff(y, theta3)],
-                    # [diff(z, theta1), diff(z, theta2), diff(y, theta3)]
-                 # ])
+    # print("x {}, y {}, z {}".format(x, y, z))
+
+    return Matrix([ [diff(x, theta1), diff(x, theta2)],
+                    [diff(y, theta1), diff(y, theta2)],
+                 ])
   
-def main( _argv ): 
+def main( argv ): 
 
     # three angle variables  
-    theta1, theta2, theta5 = symbols("theta1 theta2 theta5") 
+    theta1, theta2, theta3 = symbols("theta1 theta2 theta3") 
+    l1, l2 = symbols("l1 l2") 
 
-    # DH_parameters = Matrix([ [0, 0, 0, theta_1],
-                             # [radians(-90), 0, 0, theta_2],
-                             # [radians(90), 0, 0, 0],
-                             # [0, 0, 55, 0],
-                             # [radians(-90), 4.5, 0, theta_5],
-                             # [radians(90), -4.5, 30, 0]
-                          # ])
+    DH_parameters = Matrix([ [0, 0, 0, theta1],
+                             [0, l1, 0, theta2],
+                             [0, l2, 0, 0]
+                          ])
                     
 
-    # final_matrx = eye(4) 
+    final_matrix = eye(4) 
 
-    # for i in range(DH_parameters.shape[0]):
-        # final_matrx = final_matrx * simplify_zero(generate_trans_matrix(DH_parameters.row(i)))
+    for i in range(DH_parameters.shape[0]):
+        final_matrix = final_matrix * (generate_trans_matrix(DH_parameters.row(i)))
 
+    final_matrix = simplify(final_matrix)
 
-    # print("trans matrix of frame 6 with respect to base frame:\n", final_matrx, "\n")
+    print("transformation matrix\n", final_matrix, "\n")
 
-    # final_matrx_simplified = simplify(final_matrx)
+    jacobian_m = jacobian(final_matrix.col(3), theta1, theta2)
 
-    # print("matrix_simplified:\n", final_matrx_simplified, "\n\n")
+    print("jacobian matrix\n", jacobian_m, "\n")
 
-    # theta1 = radians(10) 
-    # theta2 = radians(20) 
-    # theta5 = radians(45) 
-    # final_matrx_simplified = final_matrx_simplified.subs({theta_1:theta_1_radians, theta_2:theta_2_radians, theta_5:theta_5_radians})
-
-    # print("final matrix:\n", N(final_matrx_simplified))
+    jacobian_inverse = jacobian_m ** -1 
+    jacobian_inverse = simplify(jacobian_inverse)
+    
+    print("inverse jacobian matrix\n", jacobian_inverse)
 
     # jacobian_m = jacobian(final_matrx_simplified, theta_1, theta_2, theta_5)
 
@@ -82,25 +80,14 @@ def main( _argv ):
 
     # print(jacobian_m)
 
-    jacobian = Matrix([ [-55*sin(theta2)*sin(theta1) - 30*sin(theta2+theta5)*sin(theta1) - 4.5*sin(theta1)*cos(theta2) + 4.5*sin(theta1)*cos(theta2+theta5), 
-                                55*cos(theta1)*cos(theta2) + 30*cos(theta2+theta5)*cos(theta1) - 4.5*cos(theta1)*sin(theta2) + 4.5*cos(theta1)*sin(theta2+theta5), 
-                                30*cos(theta2+theta5) + 4.5*cos(theta1)*sin(theta2+theta5)], # first row 
-                        [55*cos(theta1)*sin(theta2) + 30*cos(theta1)*sin(theta2+theta5) + 4.5*cos(theta1)*cos(theta2) - 4.5*cos(theta1)*cos(theta2+theta5),
-                                55*sin(theta1)*cos(theta2) + 30*sin(theta1)*cos(theta2+theta5) - 4.5*sin(theta1)*sin(theta2) + 4.5*sin(theta1)*sin(theta2+theta5),
-                                30*sin(theta1)*cos(theta2+theta5) + 4.5*sin(theta1)*sin(theta2+theta5)],
-                        [0, -4.5*cos(theta2) + 4.5*cos(theta2+theta5) - 55*sin(theta2) - 30*sin(theta2+theta5), 
-                                4.5*cos(theta2+theta5) - 30*sin(theta2+theta5)]
-                    ])
-
-
     # jacobian.subs({theta1:theta_1_radians, theta2:theta_2_radians, theta5:theta_5_radians})
 
     # print("determinant ", jacobian.det())
     # print(N(jacobian))
 
-    jacobian_inverse = jacobian ** -1
+    # jacobian_inverse = jacobian ** -1
     
-    print(jacobian_inverse)
+    # print(jacobian_inverse)
 
     # forces = Matrix([ [5.7], [0], [0] ]) 
 
