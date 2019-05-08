@@ -34,6 +34,8 @@ def main(argv):
     leg_angle = thetas[1]
     thetas = list(map(radians, thetas))
     leg_lengths = list(map(float, argv[3:5]))
+    upper_segment = leg_lengths[0]
+    lower_segment = leg_lengths[1]
     weight = float(argv[5])
     force_m = np.array([0, weight])
 
@@ -42,13 +44,25 @@ def main(argv):
     # print("torques: ", torques)
         
 
-    # given the leg angle and lengths, find the contact point 
-    height = cos(radians(180-leg_angle))*leg_lengths[1] # height of the angel joint  
-    dist = sin(radians(180-leg_lengths))*leg_lengths[1] # distance from the contact point to angle joint 
+    # given the leg angle and lengths, find the initial position of legs 
+    # the height of legs is assumed to be 15cm
+    height = sqrt(upper_segment**2 + lower_segment**2 - 2*upper_segment*lower_segment*cos(radians(leg_angle)))
+    lower_theta = abs(asin(upper_segment/height*sin(leg_angle)))
+    dist = cos(radians(90) - lower_theta)*lower_segment # distance from segment joint to contact point 
+    joint_height = sin(radians(90) - lower_theta)*lower_segment # height of the segment joint 
     
-    start_pos = np.array([ [5, 5, 5+dist]
-                           [height+leg_lengths[0], height, 0] 
-                        ])
+    # data stores all the points to be drawn 
+    # in the order (contact point, segment joint, hip joint)
+    data = np.array([ [5, 5-dist, 5],
+                      [0, joint_height, height]
+                   ])
+
+
+    step_angle = 2 # number of degrees for rotation 
+    angle = 90 
+    
+
+    
     
 
 
